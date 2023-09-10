@@ -20,37 +20,30 @@ class Game
 
       puts 'CURRENT SCORE'
       puts 'WINNER MESSAGE'
-      play_again = reset_game
-
-      if play_again
-        init_game
-      else
-        playing = false
-      end
+      playing = false
     end
+    reset_game
   end
 
   private def get_input(inp_a, inp_b)
     input = gets.chomp
-    if input == inp_a || input == inp_b
-      input
-    else
-      puts "Incorrect entry enter #{inp_a} or #{inp_b}"
-      get_input(inp_a, inp_b)
-    end
+    return input if input == inp_a || input == inp_b
+
+    puts "Incorrect entry enter #{inp_a} or #{inp_b}"
+    get_input(inp_a, inp_b)
   end
 
   private def get_selection(player)
     puts "Enter player#{p}\'s selection (X / O)"
     selection = get_input('x', 'o')
-    Player.new(player, selection)
+    Player.new(player, selection.downcase)
   end
 
-  private def create_player(p, selection = nil)
-    puts "Enter player#{p}\'s name"
-    player = gets.chomp
-    if selection
-      selection.downcase == 'x' ? Player.new(player, 'o') : Player.new(player, 'x')
+  private def create_player(playerNum, prev_player_selection = nil)
+    puts "Enter player#{playerNum}\'s name"
+    player_name = gets.chomp
+    if prev_player_selection
+      prev_player_selection.downcase == 'x' ? Player.new(player_name, 'o') : Player.new(player_name, 'x')
     else
       get_selection(player)
     end
@@ -59,12 +52,6 @@ class Game
   private def reset_game
     puts 'Play again? (Y/ N)'
     restart = get_input('y', 'n')
-
-    if restart.downcase == 'y'
-      init_game
-    else
-      puts 'Thanks for playing'
-      false
-    end
+    restart === 'y' ? init_game : (puts 'Thanks for playing!')
   end
 end
