@@ -25,6 +25,12 @@ class Game
     reset_game
   end
 
+  private def reset_game
+    puts 'Play again? (Y/ N)'
+    restart = get_input('y', 'n')
+    restart === 'y' ? init_game : (puts 'Thanks for playing!')
+  end
+  
   private def get_input(inp_a, inp_b)
     input = gets.chomp
     return input if input == inp_a || input == inp_b
@@ -49,9 +55,4 @@ class Game
     end
   end
 
-  private def reset_game
-    puts 'Play again? (Y/ N)'
-    restart = get_input('y', 'n')
-    restart === 'y' ? init_game : (puts 'Thanks for playing!')
-  end
 end
