@@ -13,25 +13,29 @@ class Game
     p1 = create_player(1)
     p2 = create_player(2, p1.selection)
 
+    player_turn = p1
     playing = true
+    p "Lets play: #{p1.name} (#{p1.selection}) vs #{p2.name} (#{p2.selection})"
     while playing
-      p board.create_board
+      p board.create_board[0]
+      p board.create_board[1]
+      p board.create_board[2]
 
-      # GET CURRENT PLAYER
+      currentPlayer = player_turn
+      selection = player_turn(currentPlayer.name, currentPlayer.selection)
+      playing = false if board.update_board(selection, currentPlayer.selection) == 'Game Over'
 
-      selection = player_turn(1, 'x')
-      return playing = false if selection == 'Game Over'
+      board.update_board(selection, currentPlayer.selection)
 
-      board.update_board(selection, p1.selection)
-      p board.create_board
+      player_turn = currentPlayer == p1 ? p2 : p1
 
-      # CREATE GAME BOARD
-      # MAKE A MOVE
       # CHECK IF WINNER
 
       # puts 'CURRENT SCORE'
       # puts 'WINNER MESSAGE'
     end
+    p 'GAME OVER'
+    p board.create_board
     reset_game
   end
 
@@ -50,33 +54,33 @@ class Game
   end
 
   private def get_selection(player)
-    puts "Enter player#{p}\'s selection (X / O)"
+    puts "Enter #{player}\'s selection (X / O)"
     selection = get_input('x', 'o')
     Player.new(player, selection.downcase)
   end
 
-  private def create_player(playerNum, prev_player_selection = nil)
-    puts "Enter player#{playerNum}\'s name"
+  private def create_player(player_num, prev_player_selection = nil)
+    puts "Enter player #{player_num}\'s name"
     player_name = gets.chomp
     if prev_player_selection
       prev_player_selection.downcase == 'x' ? Player.new(player_name, 'o') : Player.new(player_name, 'x')
     else
-      get_selection(playerNum)
+      get_selection(player_name)
     end
   end
 
   private def player_turn(p, selection)
-    puts "Player#{p}\'s turn (#{selection})"
+    puts "Player #{p}\'s turn (#{selection})"
     input = gets.chomp
     valid_input = begin
       Integer(input)
     rescue StandardError
       false
     end
-    if valid_input && valid_input.between?(0, 8)
-      valid_input
+    if valid_input - 1 && (valid_input - 1).between?(0, 8)
+      valid_input - 1
     else
-      puts 'Enter a number between 0-8'
+      puts 'Enter a number between 1-9'
       player_turn(p, selection)
     end
   end
