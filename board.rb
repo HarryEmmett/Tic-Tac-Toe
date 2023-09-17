@@ -17,6 +17,11 @@ class Board
     create_board.flatten.uniq.length == 2 && !!create_board.flatten.uniq.include?('x') && !!create_board.flatten.uniq.include?('o')
   end
 
+  def final_board
+    # TODO: capitalize winning score to highlight
+    create_board[0].upcase + create_board[1..8]
+  end
+
   def update_board(index, player)
     # return "Invalid Move" if valid_move(index, player)
     @board_numbers[index] = player
