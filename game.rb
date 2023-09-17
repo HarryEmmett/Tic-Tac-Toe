@@ -35,7 +35,7 @@ class Game
       # puts 'WINNER MESSAGE'
     end
     p 'GAME OVER'
-    p board.create_board
+    p board.final_board
     reset_game
   end
 

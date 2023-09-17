@@ -19,7 +19,7 @@ class Board
 
   def final_board
     # TODO: capitalize winning score to highlight
-    create_board[0].upcase + create_board[1..8]
+    create_board[0][0].upcase
   end
 
   def update_board(index, player)
