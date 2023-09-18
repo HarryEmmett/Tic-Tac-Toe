@@ -9,11 +9,10 @@ class Game
 
   private def playing_game
     board = Board.new
-    game_board = board.create_board
     p1 = create_player(1)
     p2 = create_player(2, p1.selection)
 
-    player_turn = p1
+    switch_player = p1
     playing = true
     p "Lets play: #{p1.name} (#{p1.selection}) vs #{p2.name} (#{p2.selection})"
     while playing
@@ -21,13 +20,14 @@ class Game
       p board.create_board[1]
       p board.create_board[2]
 
-      currentPlayer = player_turn
-      selection = player_turn(currentPlayer.name, currentPlayer.selection)
-      playing = false if board.update_board(selection, currentPlayer.selection) == 'Game Over'
+      current_player = switch_player
+      selection = player_turn(current_player.name, current_player.selection, board.create_board.flatten)
+      playing = false if board.update_board(selection, current_player.selection) == 'Game Over'
+      playing = false if board.update_board(selection, current_player.selection)
 
-      board.update_board(selection, currentPlayer.selection)
+      board.update_board(selection, current_player.selection)
 
-      player_turn = currentPlayer == p1 ? p2 : p1
+      switch_player = current_player == p1 ? p2 : p1
 
       # CHECK IF WINNER
 
@@ -35,14 +35,16 @@ class Game
       # puts 'WINNER MESSAGE'
     end
     p 'GAME OVER'
-    p board.final_board
+    p board.winning_board[0]
+    p board.winning_board[1]
+    p board.winning_board[2]
     reset_game
   end
 
   private def reset_game
     puts 'Play again? (Y/ N)'
     restart = get_input('y', 'n')
-    restart === 'y' ? init_game : (puts 'Thanks for playing!')
+    restart == 'y' ? init_game : (puts 'Thanks for playing!')
   end
 
   private def get_input(inp_a, inp_b)
@@ -69,7 +71,7 @@ class Game
     end
   end
 
-  private def player_turn(p, selection)
+  private def player_turn(p, selection, board)
     puts "Player #{p}\'s turn (#{selection})"
     input = gets.chomp
     valid_input = begin
@@ -77,11 +79,16 @@ class Game
     rescue StandardError
       false
     end
-    if valid_input - 1 && (valid_input - 1).between?(0, 8)
-      valid_input - 1
+    if !!valid_input && valid_input - 1 && (valid_input - 1).between?(0, 8)
+      if board[valid_input - 1] == 'x' || board[valid_input - 1] == 'o'
+        puts 'Move already done'
+        player_turn(p, selection, board)
+      else
+        valid_input - 1
+      end
     else
       puts 'Enter a number between 1-9'
-      player_turn(p, selection)
+      player_turn(p, selection, board)
     end
   end
 end
