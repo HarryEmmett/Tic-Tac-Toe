@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require './player'
 require './board'
 
@@ -83,18 +85,19 @@ class Game
     end
   end
 
-  def input_int
+  def input_int_val
     input = gets.chomp
-    # begin
-    Integer(input)
-    # rescue StandardError
-    #   false
-    # end
+    begin
+      Integer(input)
+    rescue StandardError
+      false
+    end
   end
 
   def player_turn(player, selection, board)
     puts "Player #{player}\'s turn (#{selection})"
-    valid_input = input_int
+    valid_input = input_int_val
+    puts valid_input
     if !!valid_input && valid_input - 1 && (valid_input - 1).between?(0, 8)
       check_valid_input(p, selection, board, valid_input)
     else
