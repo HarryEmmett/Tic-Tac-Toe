@@ -1,5 +1,6 @@
+# board class
 class Board
-  attr_reader :board_numbers
+  attr_reader :final_result
 
   def initialize
     @board_numbers = %w[1 2 3 4 5 6 7 8 9]
@@ -9,30 +10,27 @@ class Board
     [@board_numbers[0..2], @board_numbers[3..5], @board_numbers[6..8]]
   end
 
-  def winning_board
-    case true
-    when @board_numbers[0..2].uniq.length == 1
-      final_board(0, 1, 2)
-    when @board_numbers[3..5].uniq.length == 1
-      final_board(3, 4, 5)
-    when @board_numbers[6..8].uniq.length == 1
-      final_board(6, 7, 8)
-    when [@board_numbers[0], @board_numbers[3], @board_numbers[6]].uniq.length == 1
-      final_board(0, 3, 6)
-    when [@board_numbers[1], @board_numbers[4], @board_numbers[7]].uniq.length == 1
-      final_board(1, 4, 7)
-    when [@board_numbers[2], @board_numbers[5], @board_numbers[8]].uniq.length == 1
-      final_board(2, 5, 8)
-    when [@board_numbers[0], @board_numbers[4], @board_numbers[8]].uniq.length == 1
-      final_board(0, 4, 8)
-    when [@board_numbers[2], @board_numbers[4], @board_numbers[6]].uniq.length == 1
-      final_board(2, 4, 6)
+  def print_board(game_end: false)
+    if game_end && game_win
+      puts "#{game_win[0]}\n#{game_win[1]}\n#{game_win[2]}"
+    else
+      puts "#{create_board[0]}\n#{create_board[1]}\n#{create_board[2]}"
     end
   end
 
-  def game_over
-    create_board.flatten.uniq.length == 2 && !!create_board.flatten.uniq.include?('x') && !!create_board.flatten.uniq.include?('o')
+  def game_end
+    if game_draw
+      @final_result = 'Draw'
+    elsif game_win
+      @final_result = 'Winner'
+    end
   end
+
+  def update_board(index, player)
+    @board_numbers[index] = player
+  end
+
+  private
 
   def final_board(ind, ind2, ind3)
     board = create_board.flatten
@@ -42,11 +40,20 @@ class Board
     [board[0..2], board[3..5], board[6..8]]
   end
 
-  def update_board(index, player)
-    @board_numbers[index] = player
-    'Game Over' if game_over
-    return unless winning_board
+  def game_win
+    winning_combiniations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
+    result = nil
+    winning_combiniations.each do |val|
+      if [@board_numbers[val[0]], @board_numbers[val[1]], @board_numbers[val[2]]].uniq.length == 1
+        result = final_board(val[0], val[1], val[2])
+      end
+    end
 
-    winning_board
+    result
+  end
+
+  def game_draw
+    full_board = create_board.flatten.uniq.include?('x') && create_board.flatten.uniq.include?('o')
+    create_board.flatten.uniq.length == 2 && full_board
   end
 end
