@@ -2,78 +2,70 @@
 
 require './player'
 require './board'
+require './computer'
+require './game_setup'
 
 # Game classs
 class Game
+  @current_player = nil
+  @computer = nil
+
   def init_game
-    puts "Playing X's & 0's"
-    p1 = create_player(1)
-    p2 = create_player(2, p1.selection)
+    setup = GameSetup.new
     board = Board.new
-    p "Lets play: #{p1.name} (#{p1.selection}) vs #{p2.name} (#{p2.selection})"
-    playing_game(p1, p2, board)
+    opponent = setup.set_opponent
+    @computer = true if opponent == 'c'
+    computer = Computer.new(setup.computer_difficulty) if @computer
+    p1 = setup.get_player(1)
+    p2 = setup.get_player(2, p1.selection, opponent)
+    playing_game(p1, p2, board, computer, setup)
   end
 
   private
 
-  def playing_game(ply1, ply2, board)
+  def playing_game(player1, player2, board, computer, setup)
+    setup.lets_play_message(player1, player2)
     playing = true
-    current_player = nil
     while playing
       board.print_board
 
-      current_player = switch_player(current_player, ply1, ply2)
-      selection = player_turn(current_player.name, current_player.selection, board.create_board.flatten)
+      @current_player = switch_player(@current_player, player1, player2)
 
-      board.update_board(selection, current_player.selection)
+      selection = make_move(@current_player, board, computer)
+
+      board.update_board(selection, @current_player.selection)
 
       playing = false if board.game_end
     end
-    game_over(board)
+    reset_game(player1, player2, board, setup, computer)
   end
 
-  def switch_player(player, ply1, ply2)
+  def make_move(current_player, board, computer)
+    if @computer && current_player.name == 'Computer'
+      computer.computer_choice(board)
+    else
+      player_turn(@current_player.name, @current_player.selection, board.create_board.flatten)
+    end
+  end
+
+  def switch_player(player, player1, player2)
     if !player
-      ply1
+      player1
     else
-      player == ply1 ? ply2 : ply1
+      player == player1 ? player2 : player1
     end
   end
 
-  def game_over(board)
-    p board.final_result
-    board.print_board(game_end: true)
-    reset_game
-  end
+  def reset_game(player1, player2, board, setup, computer)
+    setup.game_over(board)
+    same_players = setup.reset_prompt
+    return nil unless same_players
+    return init_game if same_players != 'y'
 
-  def reset_game
-    puts 'Play again? (Y/ N)'
-    restart = get_input('y', 'n')
-    restart == 'y' ? init_game : (puts 'Thanks for playing!')
-  end
-
-  def get_input(inp_a, inp_b)
-    input = gets.chomp
-    return input if input == inp_a || input == inp_b
-
-    puts "Incorrect entry enter #{inp_a} or #{inp_b}"
-    get_input(inp_a, inp_b)
-  end
-
-  def get_selection(player)
-    puts "Enter #{player}\'s selection (X / O)"
-    selection = get_input('x', 'o')
-    Player.new(player, selection.downcase)
-  end
-
-  def create_player(player_num, prev_player_selection = nil)
-    puts "Enter player #{player_num}\'s name"
-    player_name = gets.chomp
-    if prev_player_selection
-      prev_player_selection.downcase == 'x' ? Player.new(player_name, 'o') : Player.new(player_name, 'x')
-    else
-      get_selection(player_name)
-    end
+    is_computer = player2.name == 'Computer'
+    @computer = is_computer
+    @current_player = nil
+    playing_game(player1, player2, Board.new, Computer.new(computer.difficulty), GameSetup.new)
   end
 
   def check_valid_input(player, selection, board, valid_input)
