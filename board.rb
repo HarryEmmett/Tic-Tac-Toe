@@ -2,34 +2,27 @@
 
 # board class
 class Board
-  attr_reader :final_result
+  attr_reader :board_numbers, :final_result
 
   def initialize
     @board_numbers = %w[1 2 3 4 5 6 7 8 9]
+    @final_result = nil
   end
 
   def create_board
-    [@board_numbers[0..2], @board_numbers[3..5], @board_numbers[6..8]]
+    [board_numbers[0..2], board_numbers[3..5], board_numbers[6..8]]
   end
 
-  def print_board(game_end: false)
-    if game_end && game_win
-      puts "#{game_win[0]}\n#{game_win[1]}\n#{game_win[2]}"
-    else
-      puts "#{create_board[0]}\n#{create_board[1]}\n#{create_board[2]}"
-    end
+  def print_board
+    puts "#{create_board[0]}\n#{create_board[1]}\n#{create_board[2]}"
   end
 
-  def game_end
-    if game_draw
-      @final_result = 'Draw'
-    elsif game_win
-      @final_result = 'Winner'
-    end
+  def game_end?
+    game_draw || game_win
   end
 
-  def update_board(index, player)
-    @board_numbers[index] = player
+  def update_board(index, player_selection)
+    board_numbers[index] = player_selection
   end
 
   private
@@ -39,23 +32,26 @@ class Board
     board[ind] = board[ind].upcase
     board[ind2] = board[ind2].upcase
     board[ind3] = board[ind3].upcase
-    [board[0..2], board[3..5], board[6..8]]
+    @board_numbers = board
   end
 
   def game_win
     winning_combiniations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
-    result = nil
     winning_combiniations.each do |val|
-      if [@board_numbers[val[0]], @board_numbers[val[1]], @board_numbers[val[2]]].uniq.length == 1
-        result = final_board(val[0], val[1], val[2])
-      end
-    end
+      next unless [board_numbers[val[0]], board_numbers[val[1]], board_numbers[val[2]]].uniq.length == 1
 
-    result
+      @final_result = 'Winner'
+      final_board(val[0], val[1], val[2])
+      return true
+    end
+    false
   end
 
   def game_draw
     full_board = create_board.flatten.uniq.include?('x') && create_board.flatten.uniq.include?('o')
-    create_board.flatten.uniq.length == 2 && full_board
+    return unless create_board.flatten.uniq.length == 2 && full_board
+
+    @final_result = 'Draw'
+    true
   end
 end

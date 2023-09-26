@@ -15,12 +15,7 @@ class GameSetup
   end
 
   def lets_play_message(player1, player2)
-    p "Lets play: #{player1.name} (#{player1.selection}) vs #{player2.name} (#{player2.selection})"
-  end
-
-  def game_over(board)
-    p board.final_result
-    board.print_board(game_end: true)
+    puts "Lets play: #{player1.name} (#{player1.selection}) vs #{player2.name} (#{player2.selection})"
   end
 
   def reset_prompt
@@ -28,9 +23,7 @@ class GameSetup
     restart = get_input('y', 'n')
 
     if restart.downcase == 'y'
-
       same_players
-
     else
       puts 'Thanks for playing!'
       false
