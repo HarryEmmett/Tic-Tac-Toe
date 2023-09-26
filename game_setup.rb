@@ -8,6 +8,11 @@ class GameSetup
     get_input('h', 'c')
   end
 
+  def computer_difficulty
+    puts 'Choose difficulty? (EASY / HARD)'
+    get_input('easy', 'hard')
+  end
+
   def get_player(player_number, prev_player_selection = nil, opponent = nil)
     return create_computer(prev_player_selection) if opponent == 'c'
 
@@ -30,12 +35,15 @@ class GameSetup
     end
   end
 
-  def computer_difficulty
-    puts 'Choose difficulty? (EASY / HARD)'
-    get_input('easy', 'hard')
-  end
-
   private
+
+  def get_input(inp_a, inp_b)
+    input = gets.chomp
+    return input.downcase if input.downcase == inp_a || input.downcase == inp_b
+
+    puts "Incorrect entry enter #{inp_a} or #{inp_b}"
+    get_input(inp_a, inp_b)
+  end
 
   def create_computer(prev_player_selection)
     prev_player_selection.downcase == 'x' ? Player.new('Computer', 'o') : Player.new('Computer', 'x')
@@ -49,14 +57,6 @@ class GameSetup
     else
       get_selection(player_name)
     end
-  end
-
-  def get_input(inp_a, inp_b)
-    input = gets.chomp
-    return input.downcase if input.downcase == inp_a || input.downcase == inp_b
-
-    puts "Incorrect entry enter #{inp_a} or #{inp_b}"
-    get_input(inp_a, inp_b)
   end
 
   def get_selection(player)
