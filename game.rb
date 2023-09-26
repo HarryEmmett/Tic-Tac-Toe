@@ -2,8 +2,6 @@
 
 # Game classs
 class Game
-  attr_reader :setup, :game_board, :current_player, :computer, :player1, :player2
-
   def initialize
     @setup = GameSetup.new
     @game_board = Board.new
@@ -15,13 +13,16 @@ class Game
 
   def init_game
     opponent = setup.set_opponent
-    @computer = Computer.new(setup.computer_difficulty) if opponent == 'c'
-    @player1 = setup.get_player(1)
-    @player2 = setup.get_player(2, player1.selection, opponent)
+    self.computer = Computer.new(setup.computer_difficulty) if opponent == 'c'
+    self.player1 = setup.get_player(1)
+    self.player2 = setup.get_player(2, player1.selection, opponent)
     playing_game
   end
 
   private
+
+  attr_accessor :game_board, :current_player, :computer, :player1, :player2
+  attr_reader :setup
 
   def playing_game
     setup.lets_play_message(player1, player2)
@@ -62,12 +63,21 @@ class Game
     reset_same_players = setup.reset_prompt
     return nil unless reset_same_players
 
-    @game_board = Board.new
-    @current_player = nil
+    self.game_board = Board.new
+    self.current_player = nil
     return playing_game if reset_same_players == 'y'
 
-    @computer = nil
+    self.computer = nil
     init_game
+  end
+
+  def input_int_val
+    input = gets.chomp
+    begin
+      Integer(input)
+    rescue StandardError
+      false
+    end
   end
 
   def check_valid_move(valid_input)
@@ -77,15 +87,6 @@ class Game
       player_turn
     else
       valid_input - 1
-    end
-  end
-
-  def input_int_val
-    input = gets.chomp
-    begin
-      Integer(input)
-    rescue StandardError
-      false
     end
   end
 
