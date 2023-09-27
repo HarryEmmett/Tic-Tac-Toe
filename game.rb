@@ -43,7 +43,7 @@ class Game
 
   def make_move
     if computer && current_player.name == 'Computer'
-      computer.computer_choice(game_board.board_numbers)
+      computer.play_computer(game_board.board_numbers)
     else
       player_turn
     end
@@ -83,7 +83,7 @@ class Game
   def check_valid_move(valid_input)
     move_taken = game_board.board_numbers[valid_input - 1] == 'x' || game_board.board_numbers[valid_input - 1] == 'o'
     if move_taken
-      puts 'Move already done'
+      puts 'Move has already been played'
       player_turn
     else
       valid_input - 1
