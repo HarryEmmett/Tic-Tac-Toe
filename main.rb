@@ -10,7 +10,11 @@ require './player'
 # game.init_game
 
 computer = Computer.new('hard')
-computer.play_computer(%w[o x o 3 4 5 x x o])
-# o x o
+# computer.play_computer(%w[o x o x o x 6 7 8])
 
-# o x x
+# computer.play_computer(%w[x x x o x o x o o])
+# computer.play_computer(%w[x o x o o x x x o])
+computer.play_computer(%w[x x o x o o 6 7 8])
+# x x o 
+# x o o 
+# 6 7 8

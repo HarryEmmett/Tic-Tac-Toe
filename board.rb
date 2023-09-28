@@ -23,7 +23,7 @@ class Board
   end
 
   def game_end?
-    game_draw || game_win
+    game_win || game_draw
   end
 
   private
