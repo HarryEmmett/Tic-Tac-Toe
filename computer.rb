@@ -6,13 +6,23 @@ class Computer
     @difficulty = difficulty
     # @board = Board.new
     @current_board = nil
-    @board = ['X', 'O', 'X', 'O', ' ', ' ', ' ', 'O', ' ']
-
+    @board = nil
   end
 
   def play_computer(c)
     self.current_board = c
-    p best_move(board)
+    z = c.map do |val|
+      if val == 'x'
+        'X'
+      elsif val == 'o'
+        'O'
+      else
+        ' '
+      end
+    end
+    self.board = z
+    p "computer needs to b X currently"
+    best_move(z)
     # difficulty == 'easy' ? easy_game(c) : hard_game(c)
   end
 
