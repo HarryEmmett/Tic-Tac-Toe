@@ -4,14 +4,12 @@
 class Computer
   def initialize(difficulty)
     @difficulty = difficulty
-    @current_board = nil
     @board = nil
     @computer = nil
     @human = nil
   end
 
   def play_computer(current_board, computer, human)
-    self.current_board = current_board, computer, human
     @computer = computer
     @human = human
     z = current_board.map do |val|
@@ -20,11 +18,11 @@ class Computer
       elsif val == 'o'
         'O'
       else
-        ' '
+        val
       end
     end
     self.board = z
-    p "computer needs to b X currently"
+    p 'computer needs to b X currently'
     difficulty == 'easy' ? easy_game(current_board) : hard_game(current_board)
   end
 
@@ -47,7 +45,7 @@ class Computer
   def available_moves
     moves = []
     board.each_with_index do |cell, i|
-      moves << i if cell == ' '
+      moves << i if cell != 'O' && cell != 'X'
     end
     moves
   end
@@ -57,14 +55,14 @@ class Computer
   end
 
   def undo_move(move)
-    board[move] = ' '
+    board[move] = move.to_s
   end
 
   def winner
     winning_combinations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
 
     winning_combinations.each do |combo|
-      if board[combo[0]] == board[combo[1]] && board[combo[1]] == board[combo[2]] && board[combo[0]] != ' '
+      if board[combo[0]] == board[combo[1]] && board[combo[1]] == board[combo[2]] && board[combo[0]] == 'X' || board[combo[0]] == board[combo[1]] && board[combo[1]] == board[combo[2]] && board[combo[0]] == 'O'
         return board[combo[0]]
       end
     end
@@ -73,7 +71,8 @@ class Computer
   end
 
   def game_over?
-    winner || board.none?(' ')
+    includes_selection = board.flatten.uniq.include?('X') && board.flatten.uniq.include?('O')
+    winner || board.flatten.uniq.length == 2 && includes_selection
   end
 
   def minimax(board, depth, maximizing_player)
