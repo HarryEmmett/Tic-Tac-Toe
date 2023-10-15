@@ -13,9 +13,8 @@ class Computer
   def play_computer(current_board, computer, human)
     @computer = computer
     @human = human
-    self.board = current_board
-    p 'computer needs to b X currently'
-    difficulty == 'easy' ? easy_game(current_board) : hard_game(current_board)
+    @board = current_board
+    difficulty == 'easy' ? easy_game : hard_game(current_board)
   end
 
   private
@@ -24,11 +23,14 @@ class Computer
   attr_accessor :current_board, :board
 
   def hard_game(current_board)
-    best_move(current_board)
+    pick = best_move(current_board)
+    p "Computer chooses #{pick + 1}"
+    # board starts at 0 but displays at 1
+    pick
   end
 
-  def easy_game(current_board)
-    available = empty_index(current_board)
+  def easy_game
+    available = @board.select { |val| val != 'o' && val != 'x' }
     pick = available.sample.to_i
     p "Computer chooses #{pick}"
     pick - 1
@@ -37,7 +39,7 @@ class Computer
   def available_moves
     moves = []
     board.each_with_index do |cell, i|
-      moves << i if cell != 'o' && cell != 'x'
+      moves << i if cell != @human && cell != @computer
     end
     moves
   end
@@ -59,19 +61,19 @@ class Computer
   end
 
   def game_over?
-    includes_selection = board.flatten.uniq.include?('x') && board.flatten.uniq.include?('o')
+    includes_selection = board.flatten.uniq.include?(@computer) && board.flatten.uniq.include?(@human)
     winner || board.flatten.uniq.length == 2 && includes_selection
   end
 
   def minimax(board, depth, maximizing_player)
-    return 1 if winner == 'x'
-    return -1 if winner == 'o'
+    return 1 if winner == @computer
+    return -1 if winner == @human
     return 0 if game_over?
 
     if maximizing_player
       max_eval = -Float::INFINITY
       available_moves.each do |move|
-        make_move('x', move)
+        make_move(@computer, move)
         eval = minimax(board, depth + 1, false)
         undo_move(move)
         max_eval = [max_eval, eval].max
@@ -80,7 +82,7 @@ class Computer
     else
       min_eval = Float::INFINITY
       available_moves.each do |move|
-        make_move('o', move)
+        make_move(@human, move)
         eval = minimax(board, depth + 1, true)
         undo_move(move)
         min_eval = [min_eval, eval].min
@@ -94,7 +96,7 @@ class Computer
     best_move = nil
 
     available_moves.each do |move|
-      make_move('x', move)
+      make_move(@computer, move)
       score = minimax(board, 0, false)
       undo_move(move)
 
