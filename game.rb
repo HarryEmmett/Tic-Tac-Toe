@@ -43,7 +43,7 @@ class Game
 
   def make_move
     if computer && current_player.name == 'Computer'
-      computer.play_computer(game_board.board_numbers)
+      computer.play_computer(game_board.board_numbers, player2.selection, player1.selection)
     else
       player_turn
     end
