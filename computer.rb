@@ -4,6 +4,7 @@
 class Computer
   def initialize(difficulty)
     @difficulty = difficulty
+    @winning_combo = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
     @board = nil
     @computer = nil
     @human = nil
@@ -12,16 +13,7 @@ class Computer
   def play_computer(current_board, computer, human)
     @computer = computer
     @human = human
-    z = current_board.map do |val|
-      if val == 'x'
-        'X'
-      elsif val == 'o'
-        'O'
-      else
-        val
-      end
-    end
-    self.board = z
+    self.board = current_board
     p 'computer needs to b X currently'
     difficulty == 'easy' ? easy_game(current_board) : hard_game(current_board)
   end
@@ -45,7 +37,7 @@ class Computer
   def available_moves
     moves = []
     board.each_with_index do |cell, i|
-      moves << i if cell != 'O' && cell != 'X'
+      moves << i if cell != 'o' && cell != 'x'
     end
     moves
   end
@@ -59,31 +51,27 @@ class Computer
   end
 
   def winner
-    winning_combinations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
-
-    winning_combinations.each do |combo|
-      if board[combo[0]] == board[combo[1]] && board[combo[1]] == board[combo[2]] && board[combo[0]] == 'X' || board[combo[0]] == board[combo[1]] && board[combo[1]] == board[combo[2]] && board[combo[0]] == 'O'
-        return board[combo[0]]
-      end
+    @winning_combo.each do |val|
+      return board[val[0]] if [board[val[0]], board[val[1]], board[val[2]]].uniq.length == 1
     end
 
     nil
   end
 
   def game_over?
-    includes_selection = board.flatten.uniq.include?('X') && board.flatten.uniq.include?('O')
+    includes_selection = board.flatten.uniq.include?('x') && board.flatten.uniq.include?('o')
     winner || board.flatten.uniq.length == 2 && includes_selection
   end
 
   def minimax(board, depth, maximizing_player)
-    return 1 if winner == 'X'
-    return -1 if winner == 'O'
+    return 1 if winner == 'x'
+    return -1 if winner == 'o'
     return 0 if game_over?
 
     if maximizing_player
       max_eval = -Float::INFINITY
       available_moves.each do |move|
-        make_move('X', move)
+        make_move('x', move)
         eval = minimax(board, depth + 1, false)
         undo_move(move)
         max_eval = [max_eval, eval].max
@@ -92,7 +80,7 @@ class Computer
     else
       min_eval = Float::INFINITY
       available_moves.each do |move|
-        make_move('O', move)
+        make_move('o', move)
         eval = minimax(board, depth + 1, true)
         undo_move(move)
         min_eval = [min_eval, eval].min
@@ -106,7 +94,7 @@ class Computer
     best_move = nil
 
     available_moves.each do |move|
-      make_move('X', move)
+      make_move('x', move)
       score = minimax(board, 0, false)
       undo_move(move)
 
